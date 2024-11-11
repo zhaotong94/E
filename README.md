@@ -2,7 +2,6 @@
 
 ## Release of package
 
-
 ## Table of Contents
 - [External Links](#external-links)
 - [Link to extra experiments](#link-to-code-for-extra-experiments-with-adabelief)
@@ -71,18 +70,7 @@ The default value is updated, please check if you specify these arguments or use
 |:--------:|-----|-------|-------|---------|--------------|-----------------|-------------|---------|---------|
 | Cifar    | 1e-3 | 0.9   | 0.999 | 1e-8    | 5e-4         | False           | False      | False   | False   |
 | ImageNet | 1e-3 |0.9   | 0.999 | 1e-8    | 1e-2         | True            | False       | False   | False   |
-| Object detection (PASCAL) | 1e-4 | 0.9   | 0.999 | 1e-8    | 1e-4         | False       | False   | False   | False   |
-| LSTM-1layer| 1e-3| 0.9 | 0.999 | 1e-16   | 1.2e-6        | False           | False      | False   | False   |
-| LSTM 2,3 layer|1e-2| 0.9| 0.999 | 1e-12 |  1.2e-6.       | False           | False      | False   | False   |
-| GAN  (small)| 2e-4 |0.5| 0.999 | 1e-12   | 0            | True=False (decay=0)| False   | False   | False   |
-| SN-GAN (large)|2e-4 | 0.5   | 0.999 | 1e-16   | 0     | True=False (decay=0)| True      | False   | False   |
-| Transformer| 5e-4| 0.9 | 0.999  | 1e-16   | 1e-4         | True            | True      | False   | False   |
-| Reinforcement (Rainbow)| 1e-4 | 0.9 | 0.999 | 1e-10|     0.0           | True=False (decay=0)| True   | False   | False   |
-| Reinforcement (HalfCheetah-v2)| 1e-3 | 0.9 | 0.999 | 1e-12|     0.0           | True=False (decay=0)| True   | False   | False   |
-
-
-### Hyper-parameters in Tensorflow (eps in Tensorflow might need to be larger than in PyTorch)
-```epsilon``` is used in a different way in Tensorflow (default 1e-7) compared to PyTorch (default 1e-8), so eps in Tensorflow might needs to be larger than in PyTorch (perhaps 100 times larger in Tensorflow, e.g.  eps=1e-16 in PyTorch v.s eps=1e-14 in Tensorflow). But personally I don't have much experience with Tensorflow, it's likely that you need to slightly tune eps.
+| GPT-2 | 1e-4 | 0.9   | 0.999 | 1e-8    | 1e-4         | False       | False   | False   | False   |
 
 ## Installation and usage
 
@@ -255,12 +243,5 @@ The code is to reproduce the error is at: https://github.com/juntang-zhuang/tran
   title={AdaBelief Optimizer: Adapting Stepsizes by the Belief in Observed Gradients},
   author={Zhuang, Juntang and Tang, Tommy and Ding, Yifan and Tatikonda, Sekhar and Dvornek, Nicha and Papademetris, Xenophon and Duncan, James},
   journal={Conference on Neural Information Processing Systems},
-  year={2020}
-}
-@article{zhuang2021acprop,
-  title={Momentum Centering and Asynchronous Update for Adaptive Gradient Methods},
-  author={Zhuang, Juntang and Ding, Yifan and Tang, Tommy and Dvornek, Nicha and Tatikonda, Sekhar and Duncan, James},
-  journal={Conference on Neural Information Processing Systems},
-  year={2021}
-}
+  year={2024}
 ```
