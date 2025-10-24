@@ -1,35 +1,44 @@
-# E: An exploration-and-exploitation adaptor for gradient-based optimziers (ALTO, an instance well-suited for large-batch training) 
+# E: An exploration-and-exploitation adaptor for gradient-based optimizers (suitable for large-batch training) 
 
 ## Features
--suitable for llm pretraining
+E is a gradient-based optimizer adaptor for rendering the origin optimizer
 
+  -to explore (alpha<0) for better minima along valleys of landscapes after finding a minimum.
+  
+  -to exploit (alpha>0, converging fast) the minimum when the optimizer finds its neighbor, trying to find the bottom of the minimum.
+
+It is very suitable for large-batch training (batch size >1K, the larger the better). 
+In small batch case, the outperformances of adapted optimizers are usually marginal.
 ## Installation
 ```
 pip install git+https://github.com/zhaotong94/E
 ```
+or
+```
+pip install e-optimizer-adaptor
+```
 ## Usage
-Muon is an optimizer for the hidden weights of a neural network.
-Other parameters, such as embeddings, classifier heads, and hidden gains/biases should be optimized using standard AdamW.
-Muon should be used as follows:
-
+Here, we instantiate EAdamW from AdamW for large-batch training and EAdam from Adam for small-batch training as examples:
 ```python
 from E import E
-origin_optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, betas=(0.90, 0.95), weight_decay=0.01)
-optimizer = E(origin_optimizer)
+origin_optimizer = torch.optim.Adam(model.parameters(), lr=0.01, betas=(0.9, 0.99), weight_decay=1e-4)
+optimizer = E(origin_optimizer, alpha=0.5, beta=0.01)
 ```
 ```python
-from ALTO import ALTO
-origin_optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, betas=(0.90, 0.95), weight_decay=0.01)
+from E import E
+origin_optimizer = torch.optim.AdamW(model.parameters(), lr=0.01, betas=(0.9, 0.99), weight_decay=1e-4)
+optimizer = E(origin_optimizer, alpha=-5, beta=0.99)
 ```
-You'll have to replace `model.body`, `model.head`, and `model.embed` with whatever is appropriate for your model.
-E.g., for a ConvNet, you should use Muon to optimize all the convolutional filters except the first one, and AdamW to optimize everything else.
+For large-batch pre-training task, we recommand using ALTO directly (adapted Lamb, but the Lamb in origin paper is without bias correction).
+```python
+from ALTO import create_ALTO_optimizer
+optimizer = create_ALTO_optimizer(model, lr=0.01, betas=(0.99, 0.9, 0.99), alpha=-5, weight_decay=1e-4, eps=1e-8)
+```
 ## Discussion on hyperparameter 
-Typically, the default values of momentum (0.95), nesterov (True), and ns_steps (5) work well. Only the learning rate and weight decay must be tuned.
-The learning rate should have built-in muP scaling: That is, as you scale up the model size, you shouldn't need to retune it.
+The larger the batch size is, the larger the $-\alpha$ and $\beta_1$ (beta in E.py, the first element of betas in ALTO.py) should be. Hence, we set $\alpha=0.5, \beta_1=0.01$ in small batch training (batch size $<$1K) and $\alpha=-5, \beta_1=0.99$ in large batch case (batch size $\geq$1K), unless otherwise specified. If not mentioned, we set $\beta_2=0.9, \beta_3=0.99, \lambda=10^{-4}, \varepsilon_1=10^{-6}, \varepsilon_2=10^{-6}, \varepsilon_3=10^{-10}$. These parameters allow ALTO ample room for performance improvement. We only adjust $\beta_1$ and $\eta$ for ALTO, while for other optimizers, we tune all hyperparameters.
 ## Citation
 ```
-@inproceedings{
-anonymous2025exploring,
+@inproceedings{zhao2025exploring,
 title={Exploring Landscapes for Better Minima along Valleys},
 author={Tong Zhao, Jiacheng Li, Yuanchang Zhou, Guangming Tan, Weile Jia},
 booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems},
