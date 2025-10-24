@@ -2,13 +2,12 @@
 
 ## Features
 E is a gradient-based optimizer adaptor for rendering the origin optimizer
+  - to explore (alpha<0) for better minima along valleys of landscapes after finding a minimum.
+  - to exploit (alpha>0, converging fast) the minimum (trying to find the bottom) when the optimizer approximates its neighbor.
 
-  -to explore (alpha<0) for better minima along valleys of landscapes after finding a minimum.
-  
-  -to exploit (alpha>0, converging fast) the minimum when the optimizer finds its neighbor, trying to find the bottom of the minimum.
+It is very suitable for large-batch training (batch size $\geq1K$, the larger the better). 
 
-It is very suitable for large-batch training (batch size >1K, the larger the better). 
-In small batch case, the outperformances of adapted optimizers are usually marginal.
+In small batch training case (batch size $<1K$), the advantages of the adapted optimizers are relatively limited.
 ## Installation
 ```
 pip install git+https://github.com/zhaotong94/E
@@ -35,7 +34,11 @@ from ALTO import create_ALTO_optimizer
 optimizer = create_ALTO_optimizer(model, lr=0.01, betas=(0.99, 0.9, 0.99), alpha=-5, weight_decay=1e-4, eps=1e-8)
 ```
 ## Discussion on hyperparameter 
-The larger the batch size is, the larger the $-\alpha$ and $\beta_1$ (beta in E.py, the first element of betas in ALTO.py) should be. Hence, we set $\alpha=0.5, \beta_1=0.01$ in small batch training (batch size $<$1K) and $\alpha=-5, \beta_1=0.99$ in large batch case (batch size $\geq$1K), unless otherwise specified. If not mentioned, we set $\beta_2=0.9, \beta_3=0.99, \lambda=10^{-4}, \varepsilon_1=10^{-6}, \varepsilon_2=10^{-6}, \varepsilon_3=10^{-10}$. These parameters allow ALTO ample room for performance improvement. We only adjust $\beta_1$ and $\eta$ for ALTO, while for other optimizers, we tune all hyperparameters.
+The $\alpha$ and $\beta_1$ in paper correspond to the alpha and beta in `E.py` (alpha and the first element of betas in `ALTO.py`), respectively. The $\beta_2$ and $\beta_3$ in paper correspond to the second and third elements of betas in `ALTO.py`. Their default values are $\beta_2=0.9$ and $\beta_3=0.99$. 
+
+Our following discussion focuses on $|\alpha|<\frac{1}{1-\beta_1}$ and $0\leq\beta_1<1$. Generally, the larger the batch size is, the larger the $-\alpha$ and $\beta_1$ should be. Hence, we default to $\alpha=0.5, \beta_1=0.01$, if batch size $<1K$. If batch size $\geq1K$ we default to $\alpha=-5$ and $\beta_1=0.99$.
+
+In more depth, $\beta_1$ measures the persistence of exploration, while $|\alpha|$ determines the scale of local minima that can be escaped for exploring landscape. For large batche cases, we set $\alpha$ to be negative for larger exploration range, flatter minima, and this leads to a better test performance. However, for small batche cases we set it positive. Although a negative $\alpha$ suggests flatter local minima, the resulting improvement in generalization is insufficient to offset the usually lower training loss achieved with positive $\alpha$. If a flat minimum is desired, setting $\alpha$ to a negative value is also acceptable.
 ## Citation
 ```
 @inproceedings{zhao2025exploring,
