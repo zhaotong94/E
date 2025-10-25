@@ -63,7 +63,8 @@ class E(torch.optim.Optimizer):
                     state['step'] = 0
                     # Store previous gradient
                     state['prev_grad'] = torch.zeros_like(p.data)
-                    # state['prev_grad'] = grad.clone()
+                    if sum(p.numel() for group in self.param_groups for p in group['params'])<2:
+                        state['prev_grad'] = grad.clone()
                     state['exp_grad_diff'] = torch.zeros_like(p.data)
                 # beta = group['beta']
                 # alp = group['alp']
@@ -95,4 +96,5 @@ class E(torch.optim.Optimizer):
     # def __getattr__(self, name):
     #     if "opt" in self.__dict__:
     #         return getattr(self.opt, name)
+
     #     raise AttributeError(f"'OptimizerAdaptor' has no attribute '{name}'")
